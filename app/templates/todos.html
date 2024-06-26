@@ -27,7 +27,7 @@
       });
 
       function fetchTodos() {
-        fetch("/todos")
+        fetch("/api/todos")
           .then((response) => response.json())
           .then((todos) => {
             const todoList = document.getElementById("todo-list");
@@ -52,7 +52,7 @@
       }
 
       function addTodo(todo) {
-        fetch("/todo", {
+        fetch("/api/todo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -67,7 +67,7 @@
       }
 
       function toggleTodoDone(id, is_done) {
-        fetch(`/todo/${id}`, {
+        fetch(`/api/todo/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@
       }
 
       function deleteTodo(id) {
-        fetch(`/todo/${id}`, {
+        fetch(`/api/todo/${id}`, {
           method: "DELETE",
         }).then((response) => {
           if (response.ok) {

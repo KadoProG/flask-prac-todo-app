@@ -20,7 +20,12 @@ def create_app():
     scss.build()
 
     with app.app_context():
-        from app import routes, models
+        from app import models
+        from app.routes.api import api_bp
+        from app.routes.main import main_bp
+        app.register_blueprint(main_bp)
+        app.register_blueprint(api_bp, url_prefix='/api')
+        
         db.create_all()
 
     return app
