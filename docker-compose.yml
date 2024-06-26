@@ -1,5 +1,3 @@
-# docker-compose.yml
-
 version: "3.8"
 
 services:
@@ -9,9 +7,6 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=run.py
     depends_on:
       - db
 
@@ -23,6 +18,5 @@ services:
       POSTGRES_DB: flask_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
 volumes:
   postgres_data:
