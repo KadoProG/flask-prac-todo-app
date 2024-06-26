@@ -1,8 +1,7 @@
-from flask import current_app as app, request, jsonify, render_template
+from flask import jsonify, request
 from app.models import Todo
 from app import db
 
-@app.route('/todos', methods=['GET'])
 def get_todos():
     todos = Todo.query.all()
     return jsonify([{
@@ -12,7 +11,6 @@ def get_todos():
         'is_done': todo.is_done
     } for todo in todos])
 
-@app.route('/todo/<int:id>', methods=['GET'])
 def get_todo(id):
     todo = Todo.query.get_or_404(id)
     return jsonify({
@@ -22,7 +20,6 @@ def get_todo(id):
         'is_done': todo.is_done
     })
 
-@app.route('/todo', methods=['POST'])
 def create_todo():
     data = request.get_json()
     new_todo = Todo(
@@ -39,7 +36,6 @@ def create_todo():
         'is_done': new_todo.is_done
     }), 201
 
-@app.route('/todo/<int:id>', methods=['PUT'])
 def update_todo(id):
     data = request.get_json()
     todo = Todo.query.get_or_404(id)
@@ -59,13 +55,8 @@ def update_todo(id):
         'is_done': todo.is_done
     })
 
-@app.route('/todo/<int:id>', methods=['DELETE'])
 def delete_todo(id):
     todo = Todo.query.get_or_404(id)
     db.session.delete(todo)
     db.session.commit()
     return '', 204
-
-@app.route('/')
-def index():
-    return render_template('todos.html')
