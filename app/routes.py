@@ -1,4 +1,4 @@
-from flask import current_app as app, request, jsonify
+from flask import current_app as app, request, jsonify, render_template
 from app.models import Todo
 from app import db
 
@@ -12,7 +12,7 @@ def get_todos():
         'is_done': todo.is_done
     } for todo in todos])
 
-@app.route('/todos/<int:id>', methods=['GET'])
+@app.route('/todo/<int:id>', methods=['GET'])
 def get_todo(id):
     todo = Todo.query.get_or_404(id)
     return jsonify({
@@ -22,7 +22,7 @@ def get_todo(id):
         'is_done': todo.is_done
     })
 
-@app.route('/todos', methods=['POST'])
+@app.route('/todo', methods=['POST'])
 def create_todo():
     data = request.get_json()
     new_todo = Todo(
@@ -39,15 +39,18 @@ def create_todo():
         'is_done': new_todo.is_done
     }), 201
 
-@app.route('/todos/<int:id>', methods=['PUT'])
+@app.route('/todo/<int:id>', methods=['PUT'])
 def update_todo(id):
     data = request.get_json()
     todo = Todo.query.get_or_404(id)
-    
-    todo.title = data['title']
-    todo.content = data['content']
-    todo.is_done = data['is_done']
-    
+
+    if 'title' in data:
+        todo.title = data['title']
+    if 'content' in data:
+        todo.content = data['content']
+    if 'is_done' in data:
+        todo.is_done = data['is_done']
+
     db.session.commit()
     return jsonify({
         'id': todo.id,
@@ -56,9 +59,13 @@ def update_todo(id):
         'is_done': todo.is_done
     })
 
-@app.route('/todos/<int:id>', methods=['DELETE'])
+@app.route('/todo/<int:id>', methods=['DELETE'])
 def delete_todo(id):
     todo = Todo.query.get_or_404(id)
     db.session.delete(todo)
     db.session.commit()
     return '', 204
+
+@app.route('/')
+def index():
+    return render_template('todos.html')

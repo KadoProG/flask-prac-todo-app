@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchTodos();
+
+        document
+          .getElementById("add-todo-form")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+            addTodo({
+              title: title,
+              content: content,
+              is_done: false,
+            });
+          });
+      });
+
+      function fetchTodos() {
+        fetch("/todos")
+          .then((response) => response.json())
+          .then((todos) => {
+            const todoList = document.getElementById("todo-list");
+            todoList.innerHTML = "";
+            todos.forEach((todo) => {
+              const li = document.createElement("li");
+              li.innerHTML = `
+                            <strong>${todo.title}</strong>: ${todo.content}
+                            ${todo.is_done ? "(Done)" : "(Not Done)"}
+                            <button class="complete" onclick="toggleTodoDone(${
+                              todo.id
+                            }, ${todo.is_done})">${
+                todo.is_done ? "Undo" : "Complete"
+              }</button>
+                            <button onclick="deleteTodo(${
+                              todo.id
+                            })">Delete</button>
+                        `;
+              todoList.appendChild(li);
+            });
+          });
+      }
+
+      function addTodo(todo) {
+        fetch("/todo", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(todo),
+        }).then((response) => {
+          if (response.ok) {
+            fetchTodos();
+            document.getElementById("add-todo-form").reset();
+          }
+        });
+      }
+
+      function toggleTodoDone(id, is_done) {
+        fetch(`/todo/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ is_done: !is_done }),
+        }).then((response) => {
+          if (response.ok) {
+            fetchTodos();
+          }
+        });
+      }
+
+      function deleteTodo(id) {
+        fetch(`/todo/${id}`, {
+          method: "DELETE",
+        }).then((response) => {
+          if (response.ok) {
+            fetchTodos();
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Todo List</h1>
+    <form id="add-todo-form">
+      <input type="text" id="title" placeholder="Title" required />
+      <input type="text" id="content" placeholder="Content" required />
+      <button type="submit">Add Todo</button>
+    </form>
+    <ul id="todo-list"></ul>
+  </body>
+</html>
